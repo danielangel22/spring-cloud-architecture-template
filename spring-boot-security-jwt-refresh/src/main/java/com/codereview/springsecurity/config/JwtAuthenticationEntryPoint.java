@@ -1,12 +1,13 @@
 package com.codereview.springsecurity.config;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -24,28 +25,19 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-		Exception exception = (Exception) request.getAttribute("exception");
-
-		String message;
-
-		if (exception != null) {
-
-			byte[] body = new ObjectMapper().writeValueAsBytes(Collections.singletonMap("cause", exception.toString()));
-
-			response.getOutputStream().write(body);
-
+		Map<String, Object> resp = new HashMap<>();
+		if (request.getAttribute("exception") instanceof Exception) {
+			Exception exception = (Exception) request.getAttribute("exception");
+			resp.put("message", exception.getMessage());
+			resp.put("cause", exception.getCause());
+		} else if (!Objects.isNull(request.getAttribute("message"))) {
+			resp.put("message", request.getAttribute("message"));
 		} else {
-
-			if (authException.getCause() != null) {
-				message = authException.getCause().toString() + " " + authException.getMessage();
-			} else {
-				message = authException.getMessage();
-			}
-
-			byte[] body = new ObjectMapper().writeValueAsBytes(Collections.singletonMap("error", message));
-
-			response.getOutputStream().write(body);
+			resp.put("message", authException.getMessage());
+			resp.put("cause", authException.getCause());
 		}
+		byte[] body = new ObjectMapper().writeValueAsBytes(resp);
+		response.getOutputStream().write(body);
 	}
 
 }

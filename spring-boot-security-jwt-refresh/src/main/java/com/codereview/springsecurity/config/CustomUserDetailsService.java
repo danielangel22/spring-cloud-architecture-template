@@ -19,25 +19,24 @@ import com.codereview.springsecurity.repository.UserRepository;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-	
 	@Autowired
 	private UserRepository userDao;
 
 	@Autowired
 	private PasswordEncoder bcryptEncoder;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		List<SimpleGrantedAuthority> roles = null;
-		
-			
+
 		DAOUser user = userDao.findByUsername(username);
 		if (user != null) {
 			roles = Arrays.asList(new SimpleGrantedAuthority(user.getRole()));
 			return new User(user.getUsername(), user.getPassword(), roles);
 		}
-		throw new UsernameNotFoundException("User not found with the name " + username);	}
-	
+		throw new UsernameNotFoundException("User not found with the name " + username);
+	}
+
 	public DAOUser save(UserDTO user) {
 		DAOUser newUser = new DAOUser();
 		newUser.setUsername(user.getUsername());
