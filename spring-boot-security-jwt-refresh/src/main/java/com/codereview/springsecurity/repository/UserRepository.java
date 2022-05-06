@@ -8,5 +8,4 @@ import com.codereview.springsecurity.model.DAOUser;
 @Repository
 public interface UserRepository extends JpaRepository<DAOUser, Long> {
 	DAOUser findByUsername(String username);
-
 }
