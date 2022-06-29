@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,6 +23,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 
+@RefreshScope
 @Service
 public class JwtUtil {
 
@@ -38,7 +40,7 @@ public class JwtUtil {
 	public void setJwtExpirationInMs(int jwtExpirationInMs) {
 		this.jwtExpirationInMs = jwtExpirationInMs;
 	}
-	
+
 	@Value("${jwt.refreshExpirationDateInMs}")
 	public void setRefreshExpirationDateInMs(int refreshExpirationDateInMs) {
 		this.refreshExpirationDateInMs = refreshExpirationDateInMs;
@@ -55,7 +57,7 @@ public class JwtUtil {
 		if (roles.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
 			claims.put("isUser", true);
 		}
-		
+
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
 
@@ -65,7 +67,7 @@ public class JwtUtil {
 				.signWith(SignatureAlgorithm.HS512, secret).compact();
 
 	}
-	
+
 	public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
 
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))

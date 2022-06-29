@@ -1,0 +1,45 @@
+server:
+  port: 8081
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    serviceUrl:
+      defaultZone : http://${eureka.instance.hostname}:8761/eureka/
+
+  server:
+    eviction-interval-timer-in-ms: 1000
+
+spring:
+  application:
+    name: api-gateway-service
+  cloud:
+    gateway:
+      routes:
+        ## USER SERVICE
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
+        ## CONSUMER SERVICE
+        - id: consumer-service
+          uri: lb://CONSUMER-SERVICE
+          predicates:
+            - Path=/consumer/**
+          filters:
+            - StripPrefix=1
+        ## CONSUMER SERVICE
+        - id: dashboard-service
+          uri: lb://dashboard-service
+          predicates:
+            - Path=/dashboard/**
+          filters:
+            - StripPrefix=1
+
+      discovery:
+        locator:
+          lower-case-service-id: true
+
+

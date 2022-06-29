@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -22,6 +24,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
 public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
+
+	private static Logger logger = LoggerFactory.getLogger(CustomJwtAuthenticationFilter.class);
 
 	@Autowired
 	private JwtUtil jwtTokenUtil;
@@ -41,13 +45,13 @@ public class CustomJwtAuthenticationFilter extends OncePerRequestFilter {
 
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());
-				System.err.println(userDetails.getAuthorities());
+				// System.err.println(userDetails.getAuthorities());
 				// After setting the Authentication in the context, we specify
 				// that the current user is authenticated. So it passes the
 				// Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 			} else {
-				System.out.println("Cannot set the Security Context");
+				logger.info("Cannot set the Security Context");
 			}
 		} catch (ExpiredJwtException ex) {
 			String isRefreshToken = request.getHeader("isRefreshToken");

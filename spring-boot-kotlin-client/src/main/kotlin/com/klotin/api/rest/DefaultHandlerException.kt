@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import feign.FeignException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -15,6 +16,16 @@ class DefaultHandlerException {
 
     @ExceptionHandler
     fun parameterNotFound(ex: MissingServletRequestParameterException): ResponseEntity<Map<String, String>> {
+        return ResponseEntity(
+            mapOf(
+                "message" to "Missing parameter",
+                "error" to ex.message.toString()
+            ), HttpStatus.BAD_REQUEST
+        )
+    }
+
+    @ExceptionHandler
+    fun parameterNotFound(ex: MissingRequestHeaderException): ResponseEntity<Map<String, String>> {
         return ResponseEntity(
             mapOf(
                 "message" to "Missing parameter",
